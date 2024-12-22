@@ -52,13 +52,11 @@ public class MemberController {
 		@ApiResponse(responseCode = "500", description = "서버 오류")
 	})
 	@GetMapping("/me")
-	public ResponseEntity<MemberResponseDTO> getCurrentMember() {
+	public ResponseEntity<MemberResponseDTO> getCurrentMember(
+			@AuthenticationPrincipal CustomUserDetails userDetails) {
 		try {
-			Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-			CustomUserDetails userDetails = (CustomUserDetails)authentication.getPrincipal();
-
 			Member member = memberRepository.findById(userDetails.getId())
-				.orElseThrow(() -> new UsernameNotFoundException("Member not found"));
+					.orElseThrow(() -> new UsernameNotFoundException("Member not found"));
 			return ResponseEntity.ok(new MemberResponseDTO(member));
 		} catch (Exception e) {
 			log.error("Error getting current member: {}", e.getMessage());
